@@ -4,7 +4,7 @@ body { background: radial-gradient(ellipse at 50% 44%, #18181855, transparent 52
 .send-button svg.remix-icon { width: 24px; height: 24px; }
 .mode.active { background: #242424; }
 .chat-panel { display: flex; flex-direction: column; padding: 24px 18px 18px; background: #101010f5; }
-.chat-list { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 20px; }
+.chat-list { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 20px; gap: 0; }
 .empty-chats { margin: 22px 0 0; text-align: left; font-size: 11px; }
 .new-chat { display: flex; align-items: center; gap: 10px; }
 .account-entry { flex: 0 0 auto; width: 100%; display: flex; align-items: center; gap: 12px; border: 1px solid #ffffff18; border-radius: 14px; padding: 12px; background: #1b1b1b; color: #eee; cursor: pointer; text-align: left; }

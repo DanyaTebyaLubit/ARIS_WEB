@@ -134,6 +134,7 @@ export function buildRequest(provider, key, messages, instruction = '') {
     headers,
     body: JSON.stringify({ model: provider.model,
       messages: instruction ? [{ role: 'system', content: instruction }, ...messages.map(openAiMessage)] : messages.map(openAiMessage),
+      max_tokens: 2048,
       stream: false }),
   };
 }

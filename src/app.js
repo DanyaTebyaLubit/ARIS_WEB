@@ -440,7 +440,16 @@ $('.wordmark').onclick = event => { event.preventDefault(); newChat(); };
 const fileInput = $('#fileInput');
 const attachmentTray = $('#attachmentTray');
 $('#attachButton').onclick = () => fileInput.click();
-fileInput.onchange = () => { addAttachments([...fileInput.files]); fileInput.value = ''; };
+fileInput.onchange = () => {
+  const files = [...fileInput.files];
+  if (files.length) {
+    toast(`Загружаю ${files.length} ${files.length === 1 ? 'файл' : files.length < 5 ? 'файла' : 'файлов'}...`);
+    setTimeout(() => {
+      addAttachments(files);
+    }, 50);
+  }
+  fileInput.value = '';
+};
 function addAttachments(list) {
   for (const file of list) {
     const type = resolveAttachmentType(file.name, file.type);
