@@ -302,12 +302,6 @@ button {
 		min-width: 61px;
 		padding: 0 9px;
 	}
-	.add-button {
-		display: none;
-	}
-	.composer-divider:first-of-type {
-		display: none;
-	}
 	.mic-button {
 		margin-right: 7px;
 	}

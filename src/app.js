@@ -3,6 +3,7 @@ import { formatAnswer } from './format.js';
 import { ACCOUNT_KEY, normalizeAccount, memoryInstruction } from './account.js';
 import { resolveAttachmentType, isImageType, MAX_ATTACHMENTS, MAX_ATTACHMENT_SIZE } from './attachments.js';
 import { runChain } from './api.js';
+import { FISH_AUDIO_API_KEY } from './config.js';
 import * as cloud from './cloud.js';
 
 const $ = selector => document.querySelector(selector);
@@ -312,7 +313,8 @@ $('#settingsForm').onsubmit = event => {
 /* ================= чаты и сообщения ================= */
 function renderChats() {
   $('#chatList').replaceChildren();
-  chats.forEach(chat => {
+  const sortedChats = [...chats].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  sortedChats.forEach(chat => {
     const button = document.createElement('button');
     button.className = `chat-item${chat === current ? ' selected' : ''}`;
     button.textContent = chat.title || chat.messages.find(m => m.role === 'user')?.content.slice(0, 65) || 'Новый чат';
@@ -428,7 +430,7 @@ function newChat() {
   if (body.classList.contains('chats-open')) setChats(false);
   promptInput.focus();
 }
-$('.new-chat').onclick = $('.add-button').onclick = newChat;
+$('.new-chat').onclick = newChat;
 $('.wordmark').onclick = event => { event.preventDefault(); newChat(); };
 
 /* ================= вложения ================= */
@@ -575,17 +577,65 @@ function setMode(voice) {
   $('#voiceStatus').textContent = activeRequest ? 'Обдумываю ответ…' : 'Нажмите на микрофон, чтобы начать';
   if (!activeRequest) state.textContent = 'ARIS ГОТОВ';
 }
-function speakReply(text) {
+async function speakReply(text) {
   $('#voiceTranscript').textContent = text;
   $('#voiceStatus').textContent = 'Ответ готов. Нажмите микрофон, чтобы продолжить';
-  if (!account.speak || !window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text.replace(/```[\s\S]*?```/g, ' Блок кода доступен в чате. ').replace(/[*#`]/g, ''));
-  utterance.lang = 'ru-RU';
-  utterance.onstart = () => { body.classList.add('speaking'); $('#voiceStatus').textContent = 'ARIS говорит…'; };
-  utterance.onend = () => { body.classList.remove('speaking'); $('#voiceStatus').textContent = 'Слушаю вас — нажмите микрофон'; };
-  utterance.onerror = () => { body.classList.remove('speaking'); $('#voiceStatus').textContent = 'Озвучивание недоступно. Ответ показан на экране'; };
-  window.speechSynthesis.speak(utterance);
+  if (!account.speak) return;
+
+  const cleanText = text.replace(/```[\s\S]*?```/g, ' Блок кода доступен в чате. ').replace(/[*#`]/g, '');
+
+  if (FISH_AUDIO_API_KEY) {
+    try {
+      body.classList.add('speaking');
+      $('#voiceStatus').textContent = 'ARIS говорит…';
+
+      const response = await fetch('https://api.fish.audio/v1/tts', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${FISH_AUDIO_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: cleanText,
+          reference_id: 'russian_female_default',
+          format: 'mp3',
+          latency: 'normal'
+        })
+      });
+
+      if (!response.ok) throw new Error('Fish.audio API error');
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+
+      audio.onended = () => {
+        body.classList.remove('speaking');
+        $('#voiceStatus').textContent = 'Слушаю вас — нажмите микрофон';
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      audio.onerror = () => {
+        body.classList.remove('speaking');
+        $('#voiceStatus').textContent = 'Ошибка озвучивания. Ответ показан на экране';
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      await audio.play();
+    } catch (error) {
+      body.classList.remove('speaking');
+      $('#voiceStatus').textContent = 'Озвучивание недоступно. Ответ показан на экране';
+      console.error('Fish.audio TTS error:', error);
+    }
+  } else if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'ru-RU';
+    utterance.onstart = () => { body.classList.add('speaking'); $('#voiceStatus').textContent = 'ARIS говорит…'; };
+    utterance.onend = () => { body.classList.remove('speaking'); $('#voiceStatus').textContent = 'Слушаю вас — нажмите микрофон'; };
+    utterance.onerror = () => { body.classList.remove('speaking'); $('#voiceStatus').textContent = 'Озвучивание недоступно. Ответ показан на экране'; };
+    window.speechSynthesis.speak(utterance);
+  }
 }
 function startListening() {
   if (recognition) { recognition.stop(); return; }
@@ -709,7 +759,7 @@ async function boot() {
 }
 
 applyAccount(); applyIcons();
-for (const [selector, name] of [['#openChats','chat-3-line'],['.add-button','add-line'],['#attachButton','attachment-line'],['#micButton','mic-line'],['.send-button','arrow-up-line'],['#closeChats','close-line']]) {
+for (const [selector, name] of [['#openChats','chat-3-line'],['#attachButton','add-line'],['#micButton','mic-line'],['.send-button','arrow-up-line'],['#closeChats','close-line']]) {
   const button = $(selector); const svg = button.querySelector('svg');
   if (svg) svg.outerHTML = icon(name); else button.innerHTML = icon(name);
 }

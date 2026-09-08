@@ -4,10 +4,11 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
 		<meta name="theme-color" content="#050708" />
+		<link rel="icon" type="image/x-icon" href="favicon.ico" />
 		<title>ARIS — AI Assistant</title>
 		<meta
 			http-equiv="Content-Security-Policy"
-			content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https: ; img-src 'self' data: blob: https:; media-src 'self' blob:; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+			content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https: ; img-src 'self' data: blob: https:; media-src 'self' blob:; base-uri 'none'; form-action 'self'"
 		/>
 		<link rel="stylesheet" href="styles/ui.css" />
 		<link rel="stylesheet" href="styles/main.css" />
@@ -105,10 +106,11 @@
 				></div>
 				<form class="composer" id="composer">
 					<button
-						class="icon-button add-button"
+						class="icon-button attach-button"
+						id="attachButton"
 						type="button"
-						aria-label="Новый чат"
-						title="Новый чат"
+						aria-label="Прикрепить файл"
+						title="Прикрепить файл"
 					>
 						<svg aria-hidden="true" viewBox="0 0 24 24">
 							<path d="M12 5v14M5 12h14" />
@@ -120,16 +122,6 @@
 						type="text"
 						autocomplete="off"
 						placeholder="Спросите ARIS о чём угодно..."
-					/><button
-						class="icon-button attach-button"
-						id="attachButton"
-						type="button"
-						aria-label="Прикрепить файл"
-						title="Прикрепить файл"
-					>
-						<svg aria-hidden="true" viewBox="0 0 24 24">
-							<path d="M16 8v8a4 4 0 0 1-8 0V7a2.5 2.5 0 0 1 5 0v8a1 1 0 0 1-2 0V8H9.5v7a2.5 2.5 0 0 0 5 0V7a4 4 0 0 0-8 0v9a5.5 5.5 0 0 0 11 0V8Z" />
-						</svg></button
 					><button
 						class="icon-button mic-button"
 						id="micButton"
