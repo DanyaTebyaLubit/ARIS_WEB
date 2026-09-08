@@ -6,5 +6,7 @@ export const SUPABASE_URL =
 export const SUPABASE_ANON_KEY =
 	window.ARIS_SUPABASE_ANON_KEY ||
 	'sb_publishable_ZS20L6w5J6KNaIorjmI-5w_FE-3M8n4'
-export const BUCKET = 'attachments';
-export const isConfigured = () => /^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(SUPABASE_URL) && SUPABASE_ANON_KEY.length > 40;
+export const BUCKET = 'attachments'
+export const isConfigured = () =>
+	/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(SUPABASE_URL) &&
+	SUPABASE_ANON_KEY.length > 40
