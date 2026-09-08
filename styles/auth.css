@@ -1,0 +1,66 @@
+/* Экран входа поверх интерфейса, пока сессия Supabase не подтверждена. */
+.auth-screen {
+	position: fixed;
+	inset: 0;
+	z-index: 60;
+	display: grid;
+	place-items: center;
+	padding: 24px;
+	background: radial-gradient(120% 90% at 50% 0%, #0d1418 0%, #050708 62%);
+	overflow-y: auto;
+}
+.auth-screen[hidden] { display: none; }
+.auth-card {
+	width: min(420px, 100%);
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding: 28px 26px 24px;
+	border: 1px solid rgba(255, 255, 255, 0.09);
+	border-radius: 20px;
+	background: rgba(12, 16, 18, 0.92);
+	box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+}
+.auth-wordmark {
+	font-weight: 700;
+	letter-spacing: 0.32em;
+	font-size: 13px;
+	color: rgba(255, 255, 255, 0.55);
+}
+.auth-card h1 { margin: 0; font-size: 24px; letter-spacing: 0.01em; }
+.auth-lead { margin: 0 0 4px; font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, 0.55); }
+.auth-hint { margin: 0; font-size: 12.5px; line-height: 1.5; color: #79d6a8; min-height: 1em; }
+.auth-card .form-error { min-height: 1em; }
+.auth-links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+.link-button {
+	border: 0;
+	background: none;
+	padding: 4px 0;
+	font: inherit;
+	font-size: 12.5px;
+	color: rgba(255, 255, 255, 0.6);
+	cursor: pointer;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+.link-button:hover { color: #fff; }
+.link-button[hidden] { display: none; }
+.sign-out {
+	margin: 10px 14px 16px;
+	padding: 10px 14px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	border: 1px solid rgba(255, 255, 255, 0.09);
+	border-radius: 12px;
+	background: transparent;
+	color: rgba(255, 255, 255, 0.62);
+	font: inherit;
+	font-size: 13px;
+	cursor: pointer;
+}
+.sign-out:hover { color: #fff; border-color: rgba(255, 255, 255, 0.2); }
+.sign-out .remix-icon { width: 16px; height: 16px; }
+/* Индикатор незавершённой синхронизации. */
+body.sync-error .status i { background: #f5a623; }
+body.dropping .workspace { outline: 2px dashed rgba(255, 255, 255, 0.25); outline-offset: -12px; }

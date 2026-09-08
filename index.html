@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<meta name="theme-color" content="#050708" />
+		<title>ARIS — AI Assistant</title>
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https: ; img-src 'self' data: blob: https:; media-src 'self' blob:; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+		/>
+		<link rel="stylesheet" href="styles/ui.css" />
+		<link rel="stylesheet" href="styles/main.css" />
+		<link rel="stylesheet" href="styles/app.css" />
+		<link rel="stylesheet" href="styles/account.css" />
+		<link rel="stylesheet" href="styles/auth.css" />
+	</head>
+	<body>
+		<div class="boot-screen" aria-hidden="true">
+			<span class="boot-wordmark">ARIS</span><span class="boot-track"></span>
+		</div>
+		<div id="authScreen" class="auth-screen" hidden>
+			<form id="authForm" class="auth-card" autocomplete="on">
+				<span class="auth-wordmark">ARIS</span>
+				<h1 id="authTitle">Вход в ARIS</h1>
+				<p class="auth-lead">
+					Один аккаунт — чаты, ключи и вложения на любом устройстве.
+				</p>
+				<label class="account-field" id="authEmailField"
+					>Почта<input
+						id="authEmail"
+						type="email"
+						autocomplete="email"
+						required
+						placeholder="you@example.com"
+				/></label>
+				<label class="account-field"
+					>Пароль<input
+						id="authPassword"
+						type="password"
+						autocomplete="current-password"
+						minlength="8"
+						required
+						placeholder="Минимум 8 символов"
+				/></label>
+				<p id="authError" class="form-error" role="alert"></p>
+				<p id="authHint" class="auth-hint" role="status"></p>
+				<button id="authSubmit" class="primary-button" type="submit">Войти</button>
+				<div class="auth-links">
+					<button id="authSwitch" type="button" class="link-button">
+						Нет аккаунта — зарегистрироваться
+					</button>
+					<button id="authForgot" type="button" class="link-button">
+						Забыли пароль?
+					</button>
+				</div>
+			</form>
+		</div>
+		<header class="topbar">
+			<div class="brand-group">
+				<a class="wordmark" href="#" aria-label="ARIS — главная">ARIS</a>
+				<span class="divider"></span
+				><span class="status"><i></i>ASSISTANT</span>
+				<button
+					class="pill chats-button"
+					id="openChats"
+					aria-label="Открыть чаты"
+					type="button"
+					aria-controls="chatPanel"
+					aria-expanded="false"
+				>
+					<svg aria-hidden="true" viewBox="0 0 24 24">
+						<path
+							d="M8.3 17.2 4 20l1.2-4.1A7.2 7.2 0 0 1 3 10.8C3 6.5 7 3 12 3s9 3.5 9 7.8-4 7.7-9 7.7c-1.3 0-2.6-.2-3.7-.6Z"
+						/>
+						<path d="M8 8.5h8M8 12h5" /></svg
+					><span>ЧАТЫ</span>
+				</button>
+			</div>
+			<div class="header-actions">
+				<div class="mode-switch" role="group" aria-label="Режим общения">
+					<button class="mode active" type="button" data-mode="text">
+						ТЕКСТ</button
+					><button class="mode" type="button" data-mode="voice">ГОЛОС</button>
+				</div>
+			</div>
+		</header>
+		<main class="workspace">
+			<section class="assistant" aria-labelledby="assistantState">
+				<div class="logo-mark" aria-label="Логотип ARIS">
+					<svg viewBox="0 0 136 148" role="img" aria-hidden="true">
+						<path
+							d="M112.18 73.3125L135.5 146.223L94.4883 146.893L78.1367 99.8496L87.9209 92.8799L95.0244 86.1787L41.2803 115.799L50.3936 113.252L67.2812 106.685L39.4033 147.295L0 146.223L26.2695 73.3125L54.6826 0H86.7148L112.18 73.3125ZM44.7646 99.0449L84.0342 77.333L71.0332 39.4043L44.7646 99.0449Z"
+						/>
+					</svg>
+				</div>
+				<p class="assistant-state" id="assistantState" role="status">
+					ARIS ГОТОВ
+				</p>
+				<div
+					class="messages"
+					id="messages"
+					role="log"
+					aria-label="Сообщения"
+				></div>
+				<form class="composer" id="composer">
+					<button
+						class="icon-button add-button"
+						type="button"
+						aria-label="Новый чат"
+						title="Новый чат"
+					>
+						<svg aria-hidden="true" viewBox="0 0 24 24">
+							<path d="M12 5v14M5 12h14" />
+						</svg></button
+					><span class="composer-divider"></span
+					><label class="sr-only" for="prompt">Сообщение для ARIS</label
+					><input
+						id="prompt"
+						type="text"
+						autocomplete="off"
+						placeholder="Спросите ARIS о чём угодно..."
+					/><button
+						class="icon-button attach-button"
+						id="attachButton"
+						type="button"
+						aria-label="Прикрепить файл"
+						title="Прикрепить файл"
+					>
+						<svg aria-hidden="true" viewBox="0 0 24 24">
+							<path d="M16 8v8a4 4 0 0 1-8 0V7a2.5 2.5 0 0 1 5 0v8a1 1 0 0 1-2 0V8H9.5v7a2.5 2.5 0 0 0 5 0V7a4 4 0 0 0-8 0v9a5.5 5.5 0 0 0 11 0V8Z" />
+						</svg></button
+					><button
+						class="icon-button mic-button"
+						id="micButton"
+						type="button"
+						aria-label="Включить микрофон"
+						title="Включить микрофон"
+					>
+						<svg aria-hidden="true" viewBox="0 0 24 24">
+							<rect x="9" y="3" width="6" height="11" rx="3" />
+							<path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6" />
+						</svg></button
+					><span class="composer-divider right"></span
+					><button
+						class="send-button"
+						type="submit"
+						aria-label="Отправить сообщение"
+					>
+						<svg aria-hidden="true" viewBox="0 0 24 24">
+							<path d="M12 19V5M6.5 10.5 12 5l5.5 5.5" />
+						</svg>
+					</button>
+					<input
+						id="fileInput"
+						type="file"
+						multiple
+						hidden
+						accept=".png,.jpg,.jpeg,.webp,.gif,.txt,.log,.md,.markdown,.csv,.tsv,.json,.js,.mjs,.cjs,.ts,.py,.rb,.java,.c,.cpp,.h,.cs,.go,.rs,.sh,.yml,.yaml,.xml,.css,.ini,.sql,image/png,image/jpeg,image/webp,image/gif,text/plain,text/markdown,text/csv,application/json"
+					/>
+				</form>
+				<div id="attachmentTray" class="attachment-tray" hidden></div>
+			</section>
+			<section class="voice-stage" aria-label="Голосовой разговор" hidden>
+				<div class="voice-eyebrow">ARIS VOICE</div>
+				<div class="voice-orb" aria-hidden="true">
+					<div class="voice-wave"><i></i><i></i><i></i><i></i><i></i></div>
+				</div>
+				<h1 id="voiceTitle">Давайте поговорим</h1>
+				<p id="voiceStatus" role="status">Нажмите на микрофон, чтобы начать</p>
+				<p id="voiceTranscript" class="voice-transcript"></p>
+				<div class="voice-controls">
+					<button
+						id="voiceListen"
+						class="voice-main-button"
+						type="button"
+						aria-label="Начать голосовой ввод"
+						data-icon="mic-line"
+					></button
+					><button
+						id="voiceCancel"
+						class="voice-secondary-button"
+						type="button"
+						aria-label="Остановить разговор"
+						data-icon="stop-line"
+					></button>
+				</div>
+				<button id="backToText" class="back-to-text" type="button">
+					<span data-icon="keyboard-line"></span>Вернуться к тексту
+				</button>
+			</section>
+		</main>
+		<aside class="chat-panel" id="chatPanel" aria-hidden="true" inert>
+			<div class="panel-header">
+				<h2>Чаты</h2>
+				<button
+					class="panel-close"
+					id="closeChats"
+					type="button"
+					aria-label="Закрыть список чатов"
+				>
+					×
+				</button>
+			</div>
+			<button class="new-chat" type="button">＋ Новый чат</button>
+			<p class="empty-chats">История хранится в вашем аккаунте Supabase и открывается на любом устройстве</p>
+			<div id="chatList" class="chat-list"></div>
+			<button class="account-entry" id="openSettings" type="button">
+				<span class="account-avatar" data-icon="user-3-line"></span
+				><span
+					><strong id="accountName">Аккаунт</strong
+					><small id="accountEmail">Настройки и персонализация</small></span
+				><span data-icon="arrow-right-s-line"></span>
+			</button>
+			<button class="sign-out" id="signOut" type="button">
+				<span data-icon="logout-box-r-line"></span>Выйти из аккаунта
+			</button>
+		</aside>
+		<button
+			class="backdrop"
+			id="backdrop"
+			type="button"
+			aria-label="Закрыть список чатов"
+			tabindex="-1"
+		></button>
+		<dialog
+			id="settings"
+			class="settings-dialog"
+			aria-labelledby="settingsTitle"
+		>
+			<div class="account-header">
+				<div>
+					<span class="eyebrow">ВАШЕ ПРОСТРАНСТВО</span>
+					<h2 id="settingsTitle">Аккаунт</h2>
+				</div>
+				<button
+					type="button"
+					class="panel-close"
+					id="closeSettings"
+					aria-label="Закрыть настройки"
+					data-icon="close-line"
+				></button>
+			</div>
+			<div class="account-tabs" role="tablist" aria-label="Настройки аккаунта">
+				<button
+					id="tab-connections"
+					type="button"
+					role="tab"
+					aria-controls="settingsForm"
+					aria-selected="true"
+					data-tab="connections"
+				>
+					<span data-icon="plug-line"></span>Подключения
+				</button>
+				<button
+					id="tab-appearance"
+					type="button"
+					role="tab"
+					aria-controls="appearanceForm"
+					aria-selected="false"
+					data-tab="appearance"
+				>
+					<span data-icon="palette-line"></span>Внешний вид
+				</button>
+				<button
+					id="tab-memory"
+					type="button"
+					role="tab"
+					aria-controls="memoryForm"
+					aria-selected="false"
+					data-tab="memory"
+				>
+					<span data-icon="brain-line"></span>Память
+				</button>
+			</div>
+			<form
+				id="settingsForm"
+				role="tabpanel"
+				aria-labelledby="tab-connections"
+				data-pane="connections"
+			>
+				<p class="settings-intro">
+					Ваши модели. Ваш порядок.<br />Ключи проверяются по очереди, затем
+					запрос переходит к следующему провайдеру.
+				</p>
+				<div class="connection-note">
+						Ключи хранятся в вашей строке в Supabase: их видит только этот аккаунт.
+						Запрос уходит из браузера прямо провайдеру, промежуточного сервера нет.
+					</div>
+				<div id="providerList" class="provider-list"></div>
+				<button type="button" class="add-provider" id="addProvider">
+					＋ Добавить провайдера
+				</button>
+				<p id="settingsError" class="form-error" role="alert"></p>
+				<div class="settings-footer">
+					<span id="connectionCount"></span
+					><button type="submit" class="primary-button">
+						Сохранить подключения
+					</button>
+				</div>
+			</form>
+			<form
+				id="appearanceForm"
+				data-pane="appearance"
+				role="tabpanel"
+				aria-labelledby="tab-appearance"
+				hidden
+			>
+				<h3>Сделайте ARIS своим</h3>
+				<p class="settings-intro">Спокойный интерфейс, удобный именно вам.</p>
+				<label class="account-field"
+					>Как к вам обращаться<input
+						id="displayName"
+						maxlength="60"
+						placeholder="Ваше имя"
+						autocomplete="off"
+				/></label>
+				<label class="account-field"
+					>Размер ответов<select id="textSize">
+						<option value="small">Компактный</option>
+						<option value="normal">Обычный</option>
+						<option value="large">Крупный</option>
+					</select></label
+				>
+				<label class="account-toggle"
+					><span
+						><strong>Анимации</strong
+						><small>Плавные переходы и появление элементов</small></span
+					><input id="animations" type="checkbox" checked
+				/></label>
+				<label class="account-toggle"
+					><span
+						><strong>Озвучивать ответы</strong
+						><small>В голосовом режиме, голосом браузера</small></span
+					><input id="speakAnswers" type="checkbox" checked
+				/></label>
+				<button class="primary-button" type="submit">
+					Сохранить внешний вид
+				</button>
+			</form>
+			<form
+				id="memoryForm"
+				data-pane="memory"
+				role="tabpanel"
+				aria-labelledby="tab-memory"
+				hidden
+			>
+				<h3>То, что стоит помнить</h3>
+				<p class="settings-intro">
+					Добавьте факты о себе и пожелания к ответам. При включённой памяти они
+					передаются модели с каждым новым запросом.
+				</p>
+				<label class="account-toggle"
+					><span
+						><strong>Использовать память</strong
+						><small>Ваши заметки учитываются во всех чатах</small></span
+					><input id="memoryEnabled" type="checkbox"
+				/></label>
+				<label class="account-field"
+					>Ваши заметки<textarea
+						id="memoryNotes"
+						rows="7"
+						maxlength="8000"
+						placeholder="Например: отвечай по-русски, объясняй коротко. Я изучаю JavaScript."
+					></textarea>
+				</label>
+				<p class="memory-note">
+						Заметки хранятся в вашем аккаунте Supabase. ARIS не добавляет
+						воспоминания автоматически.
+					</p>
+				<button class="primary-button" type="submit">Сохранить память</button>
+			</form>
+		</dialog>
+		<div id="toast" class="toast" role="status"></div>
+		<script src="src/app.js" type="module"></script>
+	</body>
+</html>

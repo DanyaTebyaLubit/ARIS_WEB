@@ -1,0 +1,8 @@
+{
+  "name": "aris-cloud",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes serve . -l 5173"
+  }
+}
