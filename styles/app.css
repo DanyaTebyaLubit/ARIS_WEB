@@ -1,6 +1,7 @@
 :root { --ease: cubic-bezier(.22, 1, .36, 1); }
 .chat-row { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .chat-row .chat-item { flex: 1; min-width: 0; }
+.chat-row, .chat-item { animation: none !important; }
 .chat-action { flex: 0 0 36px; height: 40px; border: 0; border-radius: 8px; background: transparent; color: #a5a5a5; cursor: pointer; }
 .chat-action:hover { background: #292929; }
 .error-message { border-color: #4d4d4d; background: #1a1a1a; color: #c3c3c3; padding: 16px; }
@@ -97,6 +98,19 @@ input[type=checkbox] { accent-color: #afafaf; width: 15px; height: 15px; }
 .form-error:empty { display: none; }
 .toast { position: fixed; z-index: 100; bottom: 24px; left: 50%; transform: translate(-50%, 12px); width: max-content; max-width: calc(100% - 32px); padding: 12px 18px; border: 1px solid #424242; border-radius: 12px; color: #c8c8c8; background: #1c1c1cf2; font-size: 12px; line-height: 1.5; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; }
 .toast.visible { opacity: 1; transform: translate(-50%, 0); }
+.confirm-dialog { width: min(420px, calc(100% - 32px)); padding: 0; border: 1px solid #333; border-radius: 16px; background: #0e0e0e; color: var(--text); box-shadow: 0 30px 100px #00000099; }
+.confirm-dialog::backdrop { background: #00000099; backdrop-filter: blur(8px); animation: fade-in .25s ease; }
+.confirm-dialog[open] { animation: enter-up .3s var(--ease); }
+.confirm-content { padding: 24px; }
+.confirm-content h3 { margin: 0 0 12px; font-size: 18px; font-weight: 500; letter-spacing: -.02em; }
+.confirm-content p { margin: 0 0 20px; color: #aaa; font-size: 14px; line-height: 1.6; }
+.prompt-input { width: 100%; background: #080808; color: #eee; border: 1px solid #333; border-radius: 10px; padding: 12px; font: inherit; font-size: 14px; margin-bottom: 20px; }
+.prompt-input:focus { outline: none; border-color: #555; }
+.confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.secondary-button { border: 1px solid #333; border-radius: 10px; padding: 12px 18px; background: transparent; color: #aaa; font-size: 12px; cursor: pointer; }
+.secondary-button:hover { background: #1a1a1a; color: #eee; }
+.danger-button { border: 0; border-radius: 10px; padding: 12px 18px; background: #c55; color: #fff; font-size: 12px; cursor: pointer; font-weight: 500; }
+.danger-button:hover { background: #d66; }
 .boot-screen { position: fixed; z-index: 200; inset: 0; background: #070707; display: grid; place-content: center; justify-items: center; gap: 22px; pointer-events: none; animation: boot-out .45s .6s ease forwards; }
 .boot-wordmark { font-size: 24px; letter-spacing: .5em; padding-left: .5em; animation: enter-up .5s var(--ease); }
 .boot-track { width: 80px; height: 1px; background: #2e2e2e; overflow: hidden; }

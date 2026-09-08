@@ -47,6 +47,62 @@ function toast(text) {
   toastTimer = setTimeout(() => $('#toast').classList.remove('visible'), 4200);
 }
 
+function showConfirm(title, message) {
+  return new Promise(resolve => {
+    const dialog = $('#confirmDialog');
+    $('#confirmTitle').textContent = title;
+    $('#confirmMessage').textContent = message;
+
+    const cleanup = () => {
+      $('#confirmOk').onclick = null;
+      $('#confirmCancel').onclick = null;
+      dialog.close();
+    };
+
+    $('#confirmOk').onclick = () => {
+      cleanup();
+      resolve(true);
+    };
+
+    $('#confirmCancel').onclick = () => {
+      cleanup();
+      resolve(false);
+    };
+
+    dialog.showModal();
+  });
+}
+
+function showPrompt(title, defaultValue = '') {
+  return new Promise(resolve => {
+    const dialog = $('#promptDialog');
+    const input = $('#promptInput');
+    $('#promptTitle').textContent = title;
+    input.value = defaultValue;
+
+    const cleanup = () => {
+      $('#promptOk').onclick = null;
+      $('#promptCancel').onclick = null;
+      dialog.close();
+    };
+
+    $('#promptOk').onclick = () => {
+      const value = input.value.trim();
+      cleanup();
+      resolve(value || null);
+    };
+
+    $('#promptCancel').onclick = () => {
+      cleanup();
+      resolve(null);
+    };
+
+    dialog.showModal();
+    input.focus();
+    input.select();
+  });
+}
+
 /* ================= синхронизация с Supabase ================= */
 let profilePatch = null;
 const dirtyChats = new Map();
@@ -169,6 +225,42 @@ $('#authForm').onsubmit = async event => {
 $('#signOut').onclick = async () => {
   await flushSync();
   await cloud.signOut();
+};
+$('#deleteAllChats').onclick = async () => {
+  if (!chats.length) return toast('Нет чатов для удаления');
+  const confirmed = await showConfirm(
+    'Удалить все чаты?',
+    `Будут удалены все чаты (${chats.length}) и их вложения. Это действие нельзя отменить.`
+  );
+  if (!confirmed) return;
+
+  const allPaths = chats.flatMap(chat =>
+    chat.messages.flatMap(m => (m.attachments ?? []).map(a => a.path).filter(Boolean))
+  );
+
+  stopRequest();
+  current = { id: crypto.randomUUID(), messages: [], draft: '' };
+  promptInput.value = '';
+
+  const deletedChats = [...chats];
+  chats = [];
+  dirtyChats.clear();
+
+  renderMessages();
+  renderChats();
+  persistChats();
+
+  if (user) {
+    try {
+      await Promise.all(deletedChats.map(chat => cloud.deleteChat(user.id, chat.id)));
+      if (allPaths.length) await cloud.removeAttachments(allPaths);
+      toast('Все чаты удалены');
+    } catch (error) {
+      toast(`Не все чаты удалены в облаке: ${error.message}`);
+    }
+  } else {
+    toast('Все чаты удалены');
+  }
 };
 
 /* ================= панель чатов и настройки ================= */
@@ -329,15 +421,16 @@ function renderChats() {
     const row = document.createElement('div'); row.className = 'chat-row';
     const rename = document.createElement('button'); rename.className = 'chat-action'; rename.setAttribute('aria-label', 'Переименовать чат');
     rename.innerHTML = icon('edit-line');
-    rename.onclick = () => {
-      const name = window.prompt('Название чата', button.textContent);
+    rename.onclick = async () => {
+      const name = await showPrompt('Название чата', button.textContent);
       if (name === null || !name.trim()) return;
       chat.title = name.trim().slice(0, 100); chat.updatedAt = Date.now(); queueChat(chat); persistChats(); renderChats();
     };
     const remove = document.createElement('button'); remove.className = 'chat-action'; remove.setAttribute('aria-label', 'Удалить чат');
     remove.innerHTML = icon('delete-bin-line');
     remove.onclick = async () => {
-      if (!window.confirm(`Удалить чат «${button.textContent}» из истории?`)) return;
+      const confirmed = await showConfirm('Удалить чат?', `Чат «${button.textContent}» будет удалён из истории. Это действие нельзя отменить.`);
+      if (!confirmed) return;
       if (current === chat) {
         stopRequest(); current = { id: crypto.randomUUID(), messages: [], draft: '' }; promptInput.value = '';
       }

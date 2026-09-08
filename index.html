@@ -197,6 +197,9 @@
 			<button class="new-chat" type="button">＋ Новый чат</button>
 			<p class="empty-chats">История хранится в вашем аккаунте Supabase и открывается на любом устройстве</p>
 			<div id="chatList" class="chat-list"></div>
+			<button class="delete-all-chats" id="deleteAllChats" type="button">
+				<span data-icon="delete-bin-line"></span>Удалить все чаты
+			</button>
 			<button class="account-entry" id="openSettings" type="button">
 				<span class="account-avatar" data-icon="user-3-line"></span
 				><span
@@ -364,6 +367,26 @@
 			</form>
 		</dialog>
 		<div id="toast" class="toast" role="status"></div>
+		<dialog id="confirmDialog" class="confirm-dialog">
+			<div class="confirm-content">
+				<h3 id="confirmTitle"></h3>
+				<p id="confirmMessage"></p>
+				<div class="confirm-actions">
+					<button id="confirmCancel" class="secondary-button" type="button">Отмена</button>
+					<button id="confirmOk" class="danger-button" type="button">Удалить</button>
+				</div>
+			</div>
+		</dialog>
+		<dialog id="promptDialog" class="confirm-dialog">
+			<div class="confirm-content">
+				<h3 id="promptTitle"></h3>
+				<input id="promptInput" type="text" class="prompt-input" />
+				<div class="confirm-actions">
+					<button id="promptCancel" class="secondary-button" type="button">Отмена</button>
+					<button id="promptOk" class="primary-button" type="button">Сохранить</button>
+				</div>
+			</div>
+		</dialog>
 		<script src="src/app.js" type="module"></script>
 	</body>
 </html>
