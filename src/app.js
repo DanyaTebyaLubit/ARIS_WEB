@@ -56,17 +56,22 @@ function showConfirm(title, message) {
     const cleanup = () => {
       $('#confirmOk').onclick = null;
       $('#confirmCancel').onclick = null;
+      dialog.onclick = null;
+    };
+
+    const handleClose = (result) => {
+      cleanup();
       dialog.close();
+      resolve(result);
     };
 
-    $('#confirmOk').onclick = () => {
-      cleanup();
-      resolve(true);
-    };
+    $('#confirmOk').onclick = () => handleClose(true);
+    $('#confirmCancel').onclick = () => handleClose(false);
 
-    $('#confirmCancel').onclick = () => {
-      cleanup();
-      resolve(false);
+    dialog.onclick = (event) => {
+      if (event.target === dialog) {
+        handleClose(false);
+      }
     };
 
     dialog.showModal();
@@ -83,26 +88,35 @@ function showPrompt(title, defaultValue = '') {
     const cleanup = () => {
       $('#promptOk').onclick = null;
       $('#promptCancel').onclick = null;
+      dialog.onclick = null;
+    };
+
+    const handleClose = (value) => {
+      cleanup();
       dialog.close();
+      resolve(value);
     };
 
     $('#promptOk').onclick = () => {
       const value = input.value.trim();
-      cleanup();
-      resolve(value || null);
+      handleClose(value || null);
     };
 
-    $('#promptCancel').onclick = () => {
-      cleanup();
-      resolve(null);
+    $('#promptCancel').onclick = () => handleClose(null);
+
+    dialog.onclick = (event) => {
+      if (event.target === dialog) {
+        handleClose(null);
+      }
     };
 
     dialog.showModal();
-    input.focus();
-    input.select();
+    setTimeout(() => {
+      input.focus();
+      input.select();
+    }, 50);
   });
 }
-
 /* ================= синхронизация с Supabase ================= */
 let profilePatch = null;
 const dirtyChats = new Map();
